@@ -44,6 +44,7 @@ function Invoke-AddPolicy {
                 }
                 if ($templateEntity) {
                     $templateObj = $templateEntity.JSON | ConvertFrom-Json -ErrorAction SilentlyContinue
+                    $templateObj = Repair-CIPPIntuneTemplateNesting -Template $templateObj -Table $templatesTable
                     if ($templateObj.ReusableSettings) { $reusableSettings = $templateObj.ReusableSettings }
                     if ($templateObj.RAWJson) { $RawJSON = $templateObj.RAWJson }
                 }
@@ -55,6 +56,7 @@ function Invoke-AddPolicy {
                 # Discover referenced reusable settings from the policy JSON when none were supplied
                 $reusableResult = Get-CIPPReusableSettingsFromPolicy -PolicyJson $RawJSON -Tenant $Tenant -Headers $Headers -APIName $APIName
                 if ($reusableResult.ReusableSettings) { $reusableSettings = $reusableResult.ReusableSettings }
+                if ($reusableResult.RawJSON) { $RawJSON = $reusableResult.RawJSON }
             } catch {}
         }
 
